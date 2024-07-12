@@ -1,0 +1,15 @@
+h1{
+    text-align: center;
+}
+
+p {
+    text-align: center;
+}
+
+.contenedor-botones{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+}

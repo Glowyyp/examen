@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
-from .models import Libro, Autor, Categoria, NavItem
+from .models import Libro, Autor, Categoria, Nav
 from django.http import JsonResponse
 
 
@@ -8,19 +8,28 @@ from django.http import JsonResponse
 # Create your views here.
 
 def index(request):
-    return render(request, 'catalogo/index.html')
+    navs = Nav.objects.all()
+    context = {'navs':navs}
+    return render(request, 'catalogo/index.html', context)
 
 def libros(request):
+    navs = Nav.objects.all()
     libros = Libro.objects.all()
-    return render(request, 'catalogo/libros.html', {'libros': libros})
+    context = {'navs':navs, 'libros':libros}
+    return render(request, 'catalogo/libros.html', context)
 
 def autores(request):
+    navs = Nav.objects.all()
     autores = Autor.objects.all()
-    return render(request, 'catalogo/autores.html', {'autores': autores})
+    context = {'navs':navs, 'autores':autores}
+    return render(request, 'catalogo/autores.html', context)
 
 def categorias(request):
+    navs = Nav.objects.all()
     categorias = Categoria.objects.all()
-    return render(request, 'catalogo/categorias.html', {'categorias': categorias})
+    context = {'navs':navs, 'categorias':categorias}
+    
+    return render(request, 'catalogo/categorias.html', context)
 
 def buscar_libros(request):
     if request.method == 'GET' and 'titulo' in request.GET:

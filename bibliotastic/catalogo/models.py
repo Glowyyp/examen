@@ -17,6 +17,13 @@ class Libro(models.Model):
     autor = models.ForeignKey(Autor, on_delete=models.CASCADE)
     categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE)
 
-class NavItem(models.Model):
-    titulo = models.CharField(max_length=100)
-    url = models.URLField()
+class Nav(models.Model):
+    id_nav = models.AutoField(db_column='idNav', primary_key=True)
+    nombre_nav = models.CharField(max_length=20, blank=False, null=False)
+    url_nav = models.CharField(max_length=20, blank=False, null=False)
+
+    def __str__(self):
+        return str(self.nombre_nav)
+
+    class Meta:
+        db_table = 'Navs'
