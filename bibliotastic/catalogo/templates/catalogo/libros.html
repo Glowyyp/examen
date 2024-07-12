@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Libros</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{% static "css/styles.css" %}">
-    <link rel="stylesheet" href="{% static "css/libros.css" %}">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/libros.css' %}">
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -16,17 +16,15 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-            {% for x in navs %}
             <ul class="navbar-nav">
+                {% for x in navs %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{{x.url_nav}}">{{x.nombre_nav}}<span class="sr-only">(current)</span></a>
+                    <a class="nav-link" href="{{ x.url_nav }}">{{ x.nombre_nav }}<span class="sr-only">(current)</span></a>
                 </li>
+                {% endfor %}
             </ul>
-            {% endfor %}
         </div>
     </nav>
-
-    
 
     <div class="container mt-5">
         <h1>Libros</h1>
@@ -44,27 +42,24 @@
             </thead>
             <tbody>
                 {% for libro in libros %}
-                    <tr>
-                        <td>{{ libro.titulo }}</td>
-                        <td>{{ libro.anio_publicacion }}</td>
-                        <td>{{ libro.descripcion_breve }}</td>
-                        <td>
-                            <button class="btn btn-primary ver-mas-btn" data-id="{{ libro.id }}" data-toggle="modal" data-target="#modalLibro">Ver más</button>
-                        </td>
-                    </tr>
+                <tr>
+                    <td>{{ libro.titulo }}</td>
+                    <td>{{ libro.anio_publicacion }}</td>
+                    <td>{{ libro.descripcion_breve }}</td>
+                    <td>
+                        <button class="btn btn-primary ver-mas-btn" data-id="{{ libro.id }}" data-toggle="modal" data-target="#modalLibro">Ver más</button>
+                    </td>
+                </tr>
                 {% empty %}
-                    <tr>
-                        <td colspan="4">No se encontraron libros.</td>
-                    </tr>
+                <tr>
+                    <td colspan="4">No se encontraron libros.</td>
+                </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
-    
+
     <div class="container mt-5">
-        <div id="loader" class="text-center mt-3 d-none">
-            <i class="fas fa-circle-notch fa-spin fa-3x text-primary"></i>
-        </div>        
         <form id="searchForm">
             <div class="form-row">
                 <div class="col-md-8 mb-3">
@@ -109,112 +104,116 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-vH/jeIYv6w6j0IkP2PjE5Q6MK7b2QDn4BC8wOz4ox4xJ1KQpe7A5+UW2/0h0emL/VY6NJl1dL2Nt4DEvNjWOCg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
- 
     <script>
-        $(document).ready(function() {
-            $(document).on('click', '.ver-mas-btn', function() {
-                var libroId = $(this).data('id');
-                var url = `/obtener_libro/${libroId}/`;
-    
-                $.ajax({
-                    url: url,
-                    method: 'GET',
-                    success: function(response) {
-                        $('#modalTitulo').text(response.titulo);
-                        $('#modalAnioPublicacion').text(response.anio_publicacion);
-                        $('#modalDescripcion').text(response.descripcion_breve);
-    
-                        $('#modalLibro').modal('show').fadeIn();
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Error al obtener detalles del libro:', error);
+       $(document).ready(function() {
+    // Función para manejar el clic en el botón "Ver más"
+    function bindVerMasClick() {
+        $(document).on('click', '.ver-mas-btn', function() {
+            var libroId = $(this).data('id');
+            console.log('Clicked button data-id:', libroId);
+
+            var url = `/obtener_libro/${libroId}/`;
+            console.log('Fetching details for libro ID:', libroId);
+
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function(response) {
+                    console.log('Response from server:', response);
+                    if (response.error) {
+                        console.error('Error:', response.error);
+                        return;
                     }
-                });
-            });
-    
-            $('#searchForm').on('submit', function(event) {
-                event.preventDefault();
-    
-                var searchInput = $('#searchInput').val().trim();
-    
-                $('#searchInput').removeClass('is-invalid');
-                mostrarLoader(true); // Mostrar Loader
-    
-                // Esperar un momento antes de buscar los libros
-                setTimeout(function() {
-                    buscarLibros(searchInput);
-                }, 500); // 500 milisegundos de retraso
-            });
-    
-            function buscarLibros(tituloLibro) {
-                $.ajax({
-                    url: '/buscar_libros/',
-                    method: 'GET',
-                    data: {
-                        titulo: tituloLibro
-                    },
-                    beforeSend: function() {
-                        // Mostrar el loader antes de enviar la solicitud
-                        mostrarLoader(true);
-                    },
-                    success: function(response) {
-                        $('#librosTable tbody').empty();
-    
-                        if (response.libros.length > 0) {
-                            $.each(response.libros, function(index, libro) {
-                                var row = `<tr class="fadeIn">
-                                    <td>${libro.titulo}</td>
-                                    <td>${libro.anio_publicacion}</td>
-                                    <td>${libro.descripcion_breve}</td>
-                                    <td>
-                                        <button class="btn btn-primary ver-mas-btn" data-id="${libro.id}" data-toggle="modal" data-target="#modalLibro">Ver más</button>
-                                    </td>
-                                </tr>`;
-                                $('#librosTable tbody').append(row);
-                            });
-    
-                            $('.fadeIn').hide().fadeIn();
-                        } else {
-                            var row = `<tr>
-                                <td colspan="4">No se encontraron libros.</td>
-                            </tr>`;
-                            $('#librosTable tbody').append(row);
-    
-                            Swal.fire({
-                                title: "El libro que ha buscado no se encuentra",
-                                text: "Pruebe con otro título",
-                                icon: "question"
-                            });
-                        }
-                    },
-                    complete: function() {
-                        mostrarLoader(false); // Ocultar loader después de la búsqueda (incluso si hay error)
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Error al buscar libros:', error);
-                    }
-                });
-            }
-    
-            function mostrarLoader(mostrar) {
-                if (mostrar) {
-                    $('#loader').removeClass('d-none');
-                } else {
-                    setTimeout(function() {
-                        $('#loader').addClass('d-none');
-                    }, 2000); // Mostrar el loader durante 2 segundos antes de ocultarlo
+
+                    $('#modalTitulo').text(response.titulo);
+                    $('#modalAnioPublicacion').text(response.anio_publicacion);
+                    $('#modalDescripcion').text(response.descripcion_breve);
+                    $('#modalLibro').modal('show');
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error al obtener detalles del libro:', error);
                 }
-            }
-    
-            $('#searchInput').on('input', function() {
-                $(this).removeClass('is-invalid');
             });
-    
-            buscarLibros('');
         });
+    }
+
+    // Llamar a la función del clic al cargar la página
+    bindVerMasClick();
+
+    $('#searchForm').on('submit', function(event) {
+        event.preventDefault();
+
+        var searchInput = $('#searchInput').val().trim();
+
+        if (searchInput === '') {
+            $('#searchInput').addClass('is-invalid');
+        } else {
+            $('#searchInput').removeClass('is-invalid');
+            buscarLibros(searchInput);
+        }
+    });
+
+    function buscarLibros(tituloLibro) {
+        $.ajax({
+            url: '/buscar_libros/',
+            method: 'GET',
+            data: {
+                titulo: tituloLibro
+            },
+            beforeSend: function() {
+                mostrarLoader(true);
+            },
+            success: function(response) {
+                $('#librosTable tbody').empty();
+
+                if (response.libros.length > 0) {
+                    $.each(response.libros, function(index, libro) {
+                        var row = `<tr class="fadeIn">
+                            <td>${libro.titulo}</td>
+                            <td>${libro.anio_publicacion}</td>
+                            <td>${libro.descripcion_breve}</td>
+                            <td>
+                                <button class="btn btn-primary ver-mas-btn" data-id="${libro.id}" data-toggle="modal" data-target="#modalLibro">Ver más</button>
+                            </td>
+                        </tr>`;
+                        $('#librosTable tbody').append(row);
+                    });
+
+                    $('.fadeIn').hide().fadeIn();
+                    
+                    // Vincular nuevamente el clic después de agregar los nuevos botones
+                    bindVerMasClick();
+                } else {
+                    var row = `<tr>
+                        <td colspan="4">No se encontraron libros.</td>
+                    </tr>`;
+                    $('#librosTable tbody').append(row);
+
+                    Swal.fire({
+                        title: "El libro que ha buscado no se encuentra",
+                        text: "Pruebe con otro título",
+                        icon: "question"
+                    });
+                }
+            },
+            complete: function() {
+                mostrarLoader(false); // Ocultar loader después de la búsqueda (incluso si hay error)
+            },
+            error: function(xhr, status, error) {
+                console.error('Error al buscar libros:', error);
+            }
+        });
+    }
+
+    function mostrarLoader(mostrar) {
+        if (mostrar) {
+            $('#loader').removeClass('d-none');
+        } else {
+            $('#loader').addClass('d-none');
+        }
+    }
+});
+
     </script>
-    
-    
-    
 </body>
 </html>
