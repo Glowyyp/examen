@@ -102,26 +102,24 @@
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-  <!-- Agrega este script en tu archivo HTML (libros.html) -->
+ 
 <script>
     $(document).ready(function() {
-        // Delegación de eventos para el botón "Ver más"
+       
         $(document).on('click', '.ver-mas-btn', function() {
             var libroId = $(this).data('id');
-            var url = `/obtener_libro/${libroId}/`; // Reemplaza con la URL correcta en Django
+            var url = `/obtener_libro/${libroId}/`; 
 
-            // Realizar una solicitud AJAX para obtener los detalles del libro
+           
             $.ajax({
                 url: url,
                 method: 'GET',
                 success: function(response) {
-                    // Actualizar el contenido del modal con los detalles del libro
+                
                     $('#modalTitulo').text(response.titulo);
                     $('#modalAnioPublicacion').text(response.anio_publicacion);
                     $('#modalDescripcion').text(response.descripcion_breve);
-                    // Aquí puedes actualizar más campos del modal según tus modelos
-
-                    // Mostrar el modal
+                   
                     $('#modalLibro').modal('show');
                 },
                 error: function(xhr, status, error) {
@@ -130,7 +128,7 @@
             });
         });
 
-        // Función para manejar la búsqueda de libros
+     
         $('#searchForm').on('submit', function(event) {
             event.preventDefault();
 
@@ -144,7 +142,7 @@
             }
         });
 
-        // Función para buscar libros usando AJAX
+       
         function buscarLibros(tituloLibro) {
             $.ajax({
                 url: '/buscar_libros/',
@@ -180,7 +178,7 @@
             });
         }
 
-        // Remover la clase de error cuando el usuario empieza a escribir
+     
         $('#searchInput').on('input', function() {
             $(this).removeClass('is-invalid');
         });
