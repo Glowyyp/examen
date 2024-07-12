@@ -62,3 +62,20 @@ body {
 .nav-item .nav-link:hover {
     color: #007bff;
 }
+
+/* Contenedor del carrusel */
+.carousel-container {
+    max-width: 300px; /* Ajusta el tamaño del carrusel aquí */
+    margin: 0 auto; /* Centrar el carrusel horizontalmente */
+}
+
+/* Ajustar las imágenes dentro del carrusel */
+.carousel-inner img {
+    width: 100%;
+    height: auto; /* Mantener la proporción de las imágenes */
+}
+
+/* Ajustes adicionales para asegurar el diseño responsivo */
+.carousel-inner {
+    overflow: hidden;
+}
